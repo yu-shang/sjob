@@ -39,7 +39,7 @@ scriptname = '%s.csh' % curdir
 commandline = ' '.join(sys.argv)
 
 nodeInfo = yaml.load(open(sjob_path + '/programs/info.yaml','r'))
-queue_choices = nodeInfo[cluster_name].keys()
+queue_choices = nodeInfo[cluster_name]['queues'].keys()
 
 template_path = sjob_path + '/template/' + cluster_name + '/'
 programs = []
@@ -58,6 +58,7 @@ parser.add_argument('-n', '--nslots', help='Set the number of processors to use.
 parser.add_argument('-o', '--output', help='Set the name of the output file. (Default: output.dat)', default='output.dat')
 parser.add_argument('-p', '--program', choices=program_choices, required=True, help='Program to use.')
 parser.add_argument('-q', '--queue', choices=queue_choices, required=True, help='Queue to submit to.')
+parser.add_argument('-t', '--timelimit', required=nodeInfo[cluster_name]['timelimit'], default='00:30:00', help="Maximum wallclock time for your job.")
 parser.add_argument('--no-parse', action='store_false', dest='parseInput', default=True, help='Parse input file to detect common errors [default: parse]')
 
 # global argument checks
@@ -65,7 +66,7 @@ args = vars(parser.parse_args())
 if args['nslots'] % 2 != 0 and args['nslots'] != 1:
     parser.error("NSLOTS must be even or 1.")
 if args['nslots'] == 0:
-    args['nslots'] = nodeInfo[cluster_name][args['queue']]['numProc']
+    args['nslots'] = nodeInfo[cluster_name]['queues'][args['queue']]['numProc']
     if 'cfour' in args['program']:
         args['nslots'] = int(args['nslots']) / 2
 
@@ -77,7 +78,7 @@ if args['input'] == None:
         args['input'] = 'input.dat'
 
 # Input Check
-checks[args['program']]['check_input'](args, nodeInfo[cluster_name])
+checks[args['program']]['check_input'](args, nodeInfo[cluster_name]['queues'])
 
 # Load Mako template file
 header_template = Template(filename=template_path+'header.tmpl')
