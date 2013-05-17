@@ -8,10 +8,15 @@ from subprocess import call
 from mako.template import Template
 from programs import cfour,molpro,psi4,qchem,nwchem
 import yaml
+import socket
 
-if os.environ['USER'] == 'jagarwal':
-    print("What do you think you're doing...jerk.")
-    sys.exit(1)
+sjob_path = os.path.dirname(os.path.abspath(__file__))
+hostname = socket.gethostname()
+cluster_name = "vortex"
+if hostname == "vortex":
+    cluster_name = "vortex"
+elif "hopper" in hostname:
+    cluster_name = "hopper"
 
 def dummy_check_input(args, nodeInfo):
     pass
@@ -33,15 +38,16 @@ curdir = os.getcwd().split('/')[-1]
 scriptname = '%s.csh' % curdir
 commandline = ' '.join(sys.argv)
 
-nodeInfo = yaml.load(open('/opt/scripts/programs/info.yaml','r'))
+nodeInfo = yaml.load(open(sjob_path + '/programs/info.yaml','r'))
 queue_choices = nodeInfo.keys()
 
+template_path = sjob_path + '/template/'
 programs = []
-for root, dirnames, filenames in os.walk('/opt/scripts/template'):
+for root, dirnames, filenames in os.walk(template_path):
   for filename in fnmatch.filter(filenames, '*.tmpl'):
       programs.append(os.path.join(root, filename))
 
-program_choices = [elem[22:-5] for elem in programs]
+program_choices = [elem[len(template_path):-5] for elem in programs]
 program_choices.remove('header')
 
 parser = argparse.ArgumentParser(description='Submit jobs to the queue.')
@@ -74,7 +80,7 @@ if args['input'] == None:
 checks[args['program']]['check_input'](args, nodeInfo)
 
 # Load Mako template file
-header_template = Template(filename='/opt/scripts/template/header.tmpl')
+header_template = Template(filename=sjob_path + '/template/header.tmpl')
 
 script = None
 try:
@@ -87,7 +93,7 @@ except IOError as e:
 # Load in program specific file
 program = None
 try:
-    program = Template(filename='/opt/scripts/template/%s.tmpl' % args['program'])
+    program = Template(filename=(sjob_path+'/template/%s.tmpl') % args['program'])
 except IOError as e:
     print "Unable to open the program template file for the requested program."
     sys.exit(1)
