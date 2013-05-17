@@ -39,9 +39,9 @@ scriptname = '%s.csh' % curdir
 commandline = ' '.join(sys.argv)
 
 nodeInfo = yaml.load(open(sjob_path + '/programs/info.yaml','r'))
-queue_choices = nodeInfo.keys()
+queue_choices = nodeInfo[cluster_name].keys()
 
-template_path = sjob_path + '/template/'
+template_path = sjob_path + '/template/' + cluster_name + '/'
 programs = []
 for root, dirnames, filenames in os.walk(template_path):
   for filename in fnmatch.filter(filenames, '*.tmpl'):
@@ -65,7 +65,7 @@ args = vars(parser.parse_args())
 if args['nslots'] % 2 != 0 and args['nslots'] != 1:
     parser.error("NSLOTS must be even or 1.")
 if args['nslots'] == 0:
-    args['nslots'] = nodeInfo[args['queue']]['numProc']
+    args['nslots'] = nodeInfo[cluster_name][args['queue']]['numProc']
     if 'cfour' in args['program']:
         args['nslots'] = int(args['nslots']) / 2
 
@@ -77,10 +77,10 @@ if args['input'] == None:
         args['input'] = 'input.dat'
 
 # Input Check
-checks[args['program']]['check_input'](args, nodeInfo)
+checks[args['program']]['check_input'](args, nodeInfo[cluster_name])
 
 # Load Mako template file
-header_template = Template(filename=sjob_path + '/template/header.tmpl')
+header_template = Template(filename=template_path+'header.tmpl')
 
 script = None
 try:
@@ -93,7 +93,7 @@ except IOError as e:
 # Load in program specific file
 program = None
 try:
-    program = Template(filename=(sjob_path+'/template/%s.tmpl') % args['program'])
+    program = Template(filename=(template_path+'%s.tmpl') % args['program'])
 except IOError as e:
     print "Unable to open the program template file for the requested program."
     sys.exit(1)
