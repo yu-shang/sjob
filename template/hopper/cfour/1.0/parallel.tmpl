@@ -1,25 +1,31 @@
 # Set CFOUR Variables
-module load cfour/1.0/parallel
-
-setenv scratch $TMPDIR/$USER/$JOB_ID
-
-#Set MPI Variables
+setenv CFOUR_PATH /project/projectdirs/ccqc/cfour/1.0/hopper
+setenv PATH $CFOUR_PATH/bin:$PATH
+setenv NTasks ${nslot * nnode}
+setenv NCoresPerNode ${nslot}
+setenv NMPIPerSocket ${nslot / 2}
 setenv OMP_NUM_THREADS 1
-setenv NSLOTS ${nslots}
+
+setenv scratch $SCRATCH/$HOST/${name}
+
+if (-d $scratch) rm -rf $scratch
+mkdir -p $scratch
 
 # Copy Job/Executable Data
-cp $SGE_O_WORKDIR/${input} $scratch/ZMAT
-cp $CFOUR_GENBAS $scratch
-cp $CFOUR_ECPDATA $scratch
+cp $PBS_O_WORKDIR/${input} $scratch/ZMAT
+cp $CFOUR_PATH/basis/GENBAS $scratch
+cp $CFOUR_PATH/basis/ECPDATA $scratch
+
 if (-e GENBAS) cp GENBAS $scratch
 if (-e ECPDATA) cp ECPDATA $scratch
+if (-e FCMINT) cp FCMINT $scratch
 
 echo " Running cfour on `hostname`"
 echo " Default GENBAS is:\n    "$CFOUR_GENBAS
 echo " Running calculation..."
 
 cd $scratch
-xcfour >& $SGE_O_WORKDIR/${output}
+xcfour >& $PBS_O_WORKDIR/${output}
 xja2fja
 
 echo " Saving data and cleaning up..."

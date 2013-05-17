@@ -5,7 +5,7 @@ setenv scratch $TMPDIR/$USER/$JOB_ID
 
 #Set MPI Variables
 setenv OMP_NUM_THREADS 1
-setenv NSLOTS ${nslots}
+setenv NSLOTS ${nslot}
 
 # Copy Job/Executable Data
 cp $SGE_O_WORKDIR/${input} $scratch/ZMAT

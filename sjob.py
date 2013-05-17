@@ -54,7 +54,8 @@ parser = argparse.ArgumentParser(description='Submit jobs to the queue.')
 parser.add_argument('-d', '--debug', action='store_true',  help='Just create the script. Do not submit.')
 parser.add_argument('-i', '--input', help='Set the name of the input file. (Default: input.dat)')
 parser.add_argument('-N', '--name', help='Set name of the job. (default: %s)' % curdir, default=curdir)
-parser.add_argument('-n', '--nslots', help='Set the number of processors to use.', type=int, default=0)
+parser.add_argument('-n', '--nslot', help='Set the number of processors to use per node.', type=int, default=0)
+parser.add_argument('-c', '--nnode', help='Set the number of nodes to use.', type=int, default=1)
 parser.add_argument('-o', '--output', help='Set the name of the output file. (Default: output.dat)', default='output.dat')
 parser.add_argument('-p', '--program', choices=program_choices, required=True, help='Program to use.')
 parser.add_argument('-q', '--queue', choices=queue_choices, required=True, help='Queue to submit to.')
@@ -63,12 +64,12 @@ parser.add_argument('--no-parse', action='store_false', dest='parseInput', defau
 
 # global argument checks
 args = vars(parser.parse_args())
-if args['nslots'] % 2 != 0 and args['nslots'] != 1:
-    parser.error("NSLOTS must be even or 1.")
-if args['nslots'] == 0:
-    args['nslots'] = nodeInfo[cluster_name]['queues'][args['queue']]['numProc']
+if args['nslot'] % 2 != 0 and args['nslot'] != 1:
+    parser.error("nslot must be even or 1.")
+if args['nslot'] == 0:
+    args['nslot'] = nodeInfo[cluster_name]['queues'][args['queue']]['numProc']
     if 'cfour' in args['program']:
-        args['nslots'] = int(args['nslots']) / 2
+        args['nslot'] = int(args['nslot']) / 2
 
 # Check for cfour program and input file
 if args['input'] == None:
@@ -99,7 +100,11 @@ except IOError as e:
     print "Unable to open the program template file for the requested program."
     sys.exit(1)
 
-script.write(program.render(nslots=args['nslots'], input=args['input'], output=args['output']))
+script.write(program.render(nslot=args['nslot'],
+                            input=args['input'],
+                            output=args['output'],
+                            ncorepernode=nodeInfo[cluster_name]['queues']['numProc'],
+                            walltime=args['walltime']))
 
 script.write(checks[args['program']]['footer']())
 
