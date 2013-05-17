@@ -1,0 +1,15 @@
+module load nwchem
+
+setenv TMPDIR /tmp1/$USER/$JOB_ID
+setenv NSLOTS ${nslots}
+setenv SCRATCH_DIR /tmp1/$USER/$JOB_ID
+setenv WHICH_NWCHEM `which nwchem`
+setenv WHICH_HOST `hostname`
+
+rm -f nwchem.p
+echo "$USER $WHICH_HOST $NSLOTS $WHICH_NWCHEM $PWD" > nwchem.p
+
+parallel.x nwchem ${input} > ${output}
+
+rm nwchem.p
+

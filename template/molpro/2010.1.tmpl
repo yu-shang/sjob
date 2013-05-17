@@ -1,0 +1,6 @@
+module load molpro
+
+setenv TMPDIR /tmp1/$USER/$JOB_ID
+setenv NSLOTS ${nslots}
+
+molpro -n $NSLOTS --nouse-logfile --no-xml-output -o ${output} ${input}
