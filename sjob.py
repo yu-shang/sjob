@@ -1,4 +1,4 @@
-#!/opt/python/2.7.3/bin/python
+#!/usr/bin/env python
 
 import fnmatch
 import argparse
@@ -19,7 +19,7 @@ def dummy_check_input(args, nodeInfo):
 def dummy_footer():
     return ""
 
-checks = { 
+checks = {
            'cfour':  { 'check_input': cfour.check_input, 'footer': cfour.footer },
            'cfour/1.0/parallel':  { 'check_input': cfour.check_input, 'footer': cfour.footer },
            'cfour/1.0/serial':  { 'check_input': cfour.check_input, 'footer': cfour.footer },

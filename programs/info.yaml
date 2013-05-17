@@ -1,12 +1,18 @@
-debug.q:
-  nodeMem: 64544
-  numProc: 12
-gen2.q:
-  nodeMem: 64544
-  numProc: 12
-gen3.q:
-  nodeMem: 64544
-  numProc: 12
-large.q:
-  nodeMem: 129186
-  numProc: 12
+vortex:
+    debug.q:
+        nodeMem: 64544
+        numProc: 12
+    gen2.q:
+        nodeMem: 64544
+        numProc: 12
+    gen3.q:
+        nodeMem: 64544
+        numProc: 12
+    large.q:
+        nodeMem: 129186
+        numProc: 12
+hopper:
+    regular:
+        nodeMem: 32768
+        numProc: 24
+
