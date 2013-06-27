@@ -28,6 +28,7 @@ setenv NO_STOP_MESSAGE 1
 cd $scratch
 xcfour >& $PBS_O_WORKDIR/${output}
 xja2fja
+/projects/projectdirs/ccqc/sjob/cfour2avogadro $PBS_O_WORKDIR/${output}
 
 echo " Saving data and cleaning up..."
 if (-e ZMATnew) cp -f ZMATnew $PBS_O_WORKDIR/ZMATnew
