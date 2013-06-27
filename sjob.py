@@ -1,3 +1,4 @@
+#!/opt/python/2.7.3/bin/python
 #!/global/project/projectdirs/ccqc/python/hopper/gcc/bin/python
 
 import fnmatch
@@ -54,14 +55,16 @@ parser = argparse.ArgumentParser(description='Submit jobs to the queue.')
 parser.add_argument('-d', '--debug', action='store_true',  help='Just create the script. Do not submit.')
 parser.add_argument('-i', '--input', help='Set the name of the input file. (Default: input.dat)')
 parser.add_argument('-N', '--name', help='Set name of the job. (default: %s)' % curdir, default=curdir)
-parser.add_argument('-n', '--nslot', help='Set the number of processors to use per node.', type=int, default=0)
-parser.add_argument('-c', '--nnode', help='Set the number of nodes to use.', type=int, default=1)
 parser.add_argument('-o', '--output', help='Set the name of the output file. (Default: output.dat)', default='output.dat')
 parser.add_argument('-p', '--program', choices=program_choices, required=True, help='Program to use.')
 parser.add_argument('-q', '--queue', choices=queue_choices, required=True, help='Queue to submit to.')
-parser.add_argument('-A', '--account', help='Account to charge for time')
-parser.add_argument('-w', '--walltime', required=nodeInfo[cluster_name]['timelimit'], default='00:30:00', help="Maximum wallclock time for your job.")
+parser.add_argument('-n', '--nslot', help='Set the number of processors to use per node.', type=int, default=0)
 parser.add_argument('--no-parse', action='store_false', dest='parseInput', default=True, help='Parse input file to detect common errors [default: parse]')
+
+if cluster_name == "hopper":
+  parser.add_argument('-A', '--account', help='Account to charge for time')
+  parser.add_argument('-w', '--walltime', required=nodeInfo[cluster_name]['timelimit'], default='00:30:00', help="Maximum wallclock time for your job.")
+  parser.add_argument('-c', '--nnode', help='Set the number of nodes to use.', type=int, default=1)
 
 # global argument checks
 args = vars(parser.parse_args())
@@ -90,9 +93,14 @@ if cluster_name == "hopper" and args['account']:
     extrapbscommands = "#PBS -A %s" % (args['account'])
 
 script = None
+if not args.has_key('nnode'):
+    args['nnode'] = 1
+if not args.has_key('walltime'):
+    args['walltime'] = ""
+
 try:
     script = open(scriptname, 'w')
-    script.write(header_template.render(queue=args['queue'], 
+    script.write(header_template.render(queue=args['queue'],
 					name=args['name'],
 					nslot=args['nslot'],
 					nnode=args['nnode'],
