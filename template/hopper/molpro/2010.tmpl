@@ -1,0 +1,6 @@
+cd $PBS_O_WORKDIR
+
+module load molpro
+
+molprop --nouse-logfile --no-xml-output -n ${mppwidth} -o ${output} ${input}
+
