@@ -19,4 +19,7 @@ hopper:
         regular:
             nodeMem: 32768
             numProc: 24
+        debug:
+            nodeMem: 32768
+            numProc: 24
 

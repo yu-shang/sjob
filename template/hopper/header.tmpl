@@ -1,20 +1,19 @@
 #!/bin/csh
-#$ -q ${queue}
-#$ -N ${name}
-#$ -S /bin/csh
-#$ -cwd
-#$ -l mppnppn=${nslot}
-#$ -l mppwidth=${nnode * nslot}
-#$ -l walltime=${walltime}
+#PBS -q ${queue}
+#PBS -N ${name}
+#PBS -S /bin/csh
+#PBS -l mppnppn=${nslot}
+#PBS -l mppwidth=${mppwidth}
+#PBS -l walltime=${walltime}
 
 echo ""
 echo "***********************************************************************"
 echo " Starting job:"
 echo ""
-echo "    Name:              "$JOB_NAME
-echo "    ID:                "$JOB_ID
+echo "    Name:              "$PBS_JOBNAME
+echo "    ID:                "$PBS_JOBID
 echo "    Hostname:          "$HOSTNAME
-echo "    Working directory: "$SGE_O_WORKDIR
+echo "    Working directory: "$PBS_O_WORKDIR
 echo ""
 echo "    Submitted using:   ${cmdline}"
 echo "***********************************************************************"

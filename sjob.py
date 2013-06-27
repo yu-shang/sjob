@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/global/u1/j/jturney/progs/python/bin/python
+##!/usr/bin/env python
 
 import fnmatch
 import argparse
@@ -21,7 +22,7 @@ elif "hopper" in hostname:
 def dummy_check_input(args, nodeInfo):
     pass
 
-def dummy_footer():
+def dummy_footer(cluster):
     return ""
 
 checks = {
@@ -59,7 +60,7 @@ parser.add_argument('-c', '--nnode', help='Set the number of nodes to use.', typ
 parser.add_argument('-o', '--output', help='Set the name of the output file. (Default: output.dat)', default='output.dat')
 parser.add_argument('-p', '--program', choices=program_choices, required=True, help='Program to use.')
 parser.add_argument('-q', '--queue', choices=queue_choices, required=True, help='Queue to submit to.')
-parser.add_argument('-t', '--timelimit', required=nodeInfo[cluster_name]['timelimit'], default='00:30:00', help="Maximum wallclock time for your job.")
+parser.add_argument('-w', '--walltime', required=nodeInfo[cluster_name]['timelimit'], default='00:30:00', help="Maximum wallclock time for your job.")
 parser.add_argument('--no-parse', action='store_false', dest='parseInput', default=True, help='Parse input file to detect common errors [default: parse]')
 
 # global argument checks
@@ -87,7 +88,13 @@ header_template = Template(filename=template_path+'header.tmpl')
 script = None
 try:
     script = open(scriptname, 'w')
-    script.write(header_template.render(queue=args['queue'], name=args['name'], cmdline=commandline))
+    script.write(header_template.render(queue=args['queue'], 
+					name=args['name'],
+					nslot=args['nslot'],
+					nnode=args['nnode'],
+					mppwidth=args['nslot'] * args['nnode'],
+					walltime=args['walltime'],
+					cmdline=commandline))
 except IOError as e:
     print "Unable to create your script file."
     sys.exit(1)
@@ -101,12 +108,15 @@ except IOError as e:
     sys.exit(1)
 
 script.write(program.render(nslot=args['nslot'],
+			    name=args['name'],
                             input=args['input'],
                             output=args['output'],
-                            ncorepernode=nodeInfo[cluster_name]['queues']['numProc'],
+                            ncorepernode=nodeInfo[cluster_name]['queues'][args['queue']]['numProc'],
+			    nmpipersocket=args['nslot']/4,
+			    mppwidth=args['nslot'] * args['nnode'],
                             walltime=args['walltime']))
 
-script.write(checks[args['program']]['footer']())
+script.write(checks[args['program']]['footer'](cluster_name))
 
 # make sure there are blank lines at the end
 script.write("\n\n")
