@@ -1,15 +1,27 @@
-debug.q:
-  nodeMem: 64544
-  numProc: 12
-gen1.q:
-  nodeMem: 32272
-  numProc: 4
-gen2.q:
-  nodeMem: 64544
-  numProc: 12
-gen3.q:
-  nodeMem: 64544
-  numProc: 12
-large.q:
-  nodeMem: 129186
-  numProc: 12
+vortex:
+    timelimit: False
+    queues:
+        debug.q:
+            nodeMem: 64544
+            numProc: 12
+        gen1.q:
+            nodeMem: 32272
+            numProc: 4
+        gen2.q:
+            nodeMem: 64544
+            numProc: 12
+        gen3.q:
+            nodeMem: 64544
+            numProc: 12
+        large.q:
+            nodeMem: 129186
+            numProc: 12
+hopper:
+    timelimit: True
+    queues:
+        regular:
+            nodeMem: 32768
+            numProc: 24
+        debug:
+            nodeMem: 32768
+            numProc: 24

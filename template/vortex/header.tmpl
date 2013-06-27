@@ -1,0 +1,18 @@
+#!/bin/csh
+#$ -q ${queue}
+#$ -N ${name}
+#$ -S /bin/csh
+#$ -cwd
+
+echo ""
+echo "***********************************************************************"
+echo " Starting job:"
+echo ""
+echo "    Name:              "$JOB_NAME
+echo "    ID:                "$JOB_ID
+echo "    Hostname:          "$HOSTNAME
+echo "    Working directory: "$SGE_O_WORKDIR
+echo ""
+echo "    Submitted using:   ${cmdline}"
+echo "***********************************************************************"
+

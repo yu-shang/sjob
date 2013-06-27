@@ -1,0 +1,35 @@
+# Set CFOUR Variables
+setenv CFOUR_PATH /project/projectdirs/ccqc/cfour/1.0/hopper
+setenv PATH $CFOUR_PATH/bin:$PATH
+setenv NTasks ${mppwidth}
+setenv NCoresPerNode ${nslot}
+setenv NMPIPerSocket ${nmpipersocket}
+setenv OMP_NUM_THREADS 1
+
+setenv scratch $SCRATCH/$HOST/${name}
+
+if (-d $scratch) rm -rf $scratch
+mkdir -p $scratch
+
+# Copy Job/Executable Data
+cp $PBS_O_WORKDIR/${input} $scratch/ZMAT
+cp $CFOUR_PATH/basis/GENBAS $scratch
+cp $CFOUR_PATH/basis/ECPDATA $scratch
+
+if (-e GENBAS) cp GENBAS $scratch
+if (-e ECPDATA) cp ECPDATA $scratch
+if (-e FCMINT) cp FCMINT $scratch
+
+echo " Running cfour on `hostname`"
+echo " Running calculation..."
+
+setenv NO_STOP_MESSAGE 1
+
+cd $scratch
+xcfour >& $PBS_O_WORKDIR/${output}
+xja2fja
+
+echo " Saving data and cleaning up..."
+if (-e ZMATnew) cp -f ZMATnew $PBS_O_WORKDIR/ZMATnew
+
+echo " Job complete on `hostname`."

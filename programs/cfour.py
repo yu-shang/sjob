@@ -46,7 +46,7 @@ def check_input(args,nodeInfo):
         jobMemory = convert_mem_units(jobMemory, jobMemUnit.upper())
       else:
         jobMemory = convert_mem_units(jobMemory, "INTEGERWORDS")
-    nodeMemLimit = nodeInfo[args['queue']]['nodeMem'] * 0.95 / args['nslots']
+    nodeMemLimit = nodeInfo[args['queue']]['nodeMem'] * 0.95 / args['nslot']
     if jobMemory > nodeMemLimit: # Check if memory is more than 90% of Node
       error("Please reduce the memory of your job from "+str(jobMemory)+" MB to "+str(int(nodeMemLimit))+" MB or less for "+str(args['nslots'])+" processors")
     # If the user is performing a transition state search REQUIRE a FCMINT file.
@@ -62,10 +62,16 @@ def check_input(args,nodeInfo):
                 print("  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 sys.exit(1)
 
-def footer():
+def footer(cluster):
+  job_id = "JOB_ID"
+  workdir = "SGE_O_WORKDIR"
+  if cluster == "hopper":
+    job_id = "PBS_JOBID"
+    workdir = "PBS_O_WORKDIR"
+
   # Explicity list the files we want to save because there will be other crap in there
   toSave = [ 'FCMINT', 'FCMFINAL', 'ZMATnew', 'JMOL.plot', 'JOBARC', 'JAINDX' 'FJOBARC', 'DIPDER', 'HESSIAN', 'MOLDEN', 'AVOGADROplot.log']
-  cmd = "tar --transform \"s,^,Job_Data_${JOB_ID}/,\" -vczf ${SGE_O_WORKDIR}/Job_Data_${JOB_ID}.tgz %s" % (' '.join(toSave))
+  cmd = "tar --transform \"s,^,Job_Data_${%s}/,\" -vczf ${%s}/Job_Data_${%s}.tgz %s" % (job_id, workdir, job_id, ' '.join(toSave))
 
   return cmd
 
