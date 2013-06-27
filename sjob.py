@@ -9,17 +9,13 @@ from mako.template import Template
 from programs import cfour,molpro,psi4,qchem,nwchem
 import yaml
 
-if os.environ['USER'] == 'jagarwal':
-    print("What do you think you're doing...jerk.")
-    sys.exit(1)
-
 def dummy_check_input(args, nodeInfo):
     pass
 
 def dummy_footer():
     return ""
 
-checks = { 
+checks = {
            'cfour':  { 'check_input': cfour.check_input, 'footer': cfour.footer },
            'cfour/1.0/parallel':  { 'check_input': cfour.check_input, 'footer': cfour.footer },
            'cfour/1.0/serial':  { 'check_input': cfour.check_input, 'footer': cfour.footer },

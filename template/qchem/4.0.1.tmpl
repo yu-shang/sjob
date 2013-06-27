@@ -5,5 +5,4 @@ setenv TMPDIR /tmp1/$USER/$JOB_ID
 setenv QCSCRATCH $TMPDIR
 setenv NSLOTS ${nslots}
 
-#qchem -np $NSLOTS ${input} ${output} 
-qchem ${input} ${output} 
+qchem -np $NSLOTS ${input} ${output} 
