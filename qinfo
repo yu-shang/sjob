@@ -1,0 +1,139 @@
+#!/usr/bin/python
+
+## J. Agarwal
+## Rev 1: 5/24/13
+## Rev 2: 6/17/13 
+
+### Import required modules ###
+import commands
+import xml.etree.ElementTree as ET
+
+### Retrieve queue information ###
+
+# All users: -u '*'; Per-job queue info: -r; Queue summary: -f; XML format: -xml
+qstatCmd = "/opt/og/oge_6.2.7/bin/lx24-amd64/qstat -u '*' -r -f -xml"
+
+# Get queue info and verify
+qstat_output = commands.getstatusoutput(qstatCmd)
+if qstat_output[0] == 1: 
+   print("Could not retrieve SGE output. "+qstat[1])
+   sys.exit()
+
+# Parse XML output into a tree
+qstat_xml = ET.fromstring(qstat_output[1])
+
+### Data Processing ###
+
+# Intermediary data structures
+queueInfo = {} # queue: [slots, used]
+jobInfo = {} # queue: [[user, name, state]]
+
+# Parse queue data 
+for queue in qstat_xml.find("queue_info").getiterator("Queue-List"):
+   # General Data
+   qName = queue.find('name').text.split("@")[0] # gen3.q@v1.ccqc.uga.edu
+   qSlots = int(queue.find('slots_total').text)
+   qUsed = int(queue.find('slots_used').text)
+   qState = queue.find('state')
+   # Check if queue is adu or au
+   if qState is not None:
+      if qState.text == "au" or qState.text == "adu" or qState.text == "d" or qState.text == "E": continue
+   # Add queue data
+   if queueInfo.has_key(qName): 
+      queueInfo[qName][0] += qSlots
+      queueInfo[qName][1] += qUsed
+   else: queueInfo[qName] = [qSlots, qUsed]
+   # Add job data
+   if queue.find('job_list') is not None: # There is job running on node
+      jobName = queue.find('job_list').find('JB_name').text 
+      jobUser = queue.find('job_list').find('JB_owner').text 
+      jobState = queue.find('job_list').find('state').text 
+      jobID = queue.find('job_list').find('JB_job_number').text
+      data = [jobUser, jobName, jobState, jobID]
+      if jobInfo.has_key(qName): jobInfo[qName].append(data)
+      else: jobInfo[qName] = [data]
+
+#  Parse job data
+for job in qstat_xml.find("job_info").getiterator("job_list"):
+   jobName = job.find('JB_name').text
+   jobUser = job.find('JB_owner').text
+   jobState = job.find('state').text
+   jobQueue = job.find('hard_req_queue').text
+   jobID = job.find('JB_job_number').text
+   data = [jobUser, jobName, jobState, jobID]
+   if jobInfo.has_key(jobQueue): jobInfo[jobQueue].append(data)
+   else: jobInfo[jobQueue] = [data]
+
+### Print data ###
+
+# Color functions
+def color(phrase, color):
+   if color == "red": return("\033[91m"+phrase+"\033[0m") 
+   elif color == "grey": return("\033[90m"+phrase+"\033[0m")
+   elif color == "green": return("\033[92m"+phrase+"\033[0m")
+   elif color == "purple": return("\033[95m"+phrase+"\033[0m")
+   elif color == "blue": return("\033[94m"+phrase+"\033[0m")
+   elif color == "bold": return("\033[1m"+phrase+"\033[0m")
+
+# Title card
+print(color("-"*20, "grey"))
+print(color("# qinfo//ja//ver2  #", "grey"))
+print(color("-"*20+"\n", "grey"))
+
+# Column widths and misc information
+fCol = 10 # First column width
+sCol = 12 # Second column width
+tCol = 4 # Third column width
+nCol = 5 # Job Number column
+colSum = fCol + sCol + tCol + nCol
+endLine = color(color("|","red"), "bold")
+label = color("ID".center(nCol),"bold")+color("  User".ljust(fCol), "bold")+color("Job Name".ljust(sCol), "bold")
+label +=color("St.".center(tCol), "bold")+endLine
+dashLine = color(color("-"*((colSum+1)*len(queueInfo)), "red"), "bold")
+blank = " ".center(colSum)+endLine
+
+# Find queue headers
+headers = ""
+for queue in sorted(queueInfo):
+   used = str(queueInfo[queue][1])
+   avail = str(queueInfo[queue][0] - queueInfo[queue][1])
+   headers += (queue.split(".")[0]+" ("+used+" used/"+avail+" avail)").center(colSum+1)
+print(headers)
+print(dashLine)
+print(label*len(queueInfo))
+print(dashLine)
+
+# Print 15 entries
+for i in range(0, 16):
+   printLine = ""
+   data = 0
+   for queue in sorted(queueInfo):
+      if jobInfo.has_key(queue):
+         if len(jobInfo[queue]) > i:
+            data += 1
+            printLine += jobInfo[queue][i][3].center(nCol) # Job ID
+            printLine += (" "+jobInfo[queue][i][0][:fCol-2]).ljust(fCol) # User
+            printLine += jobInfo[queue][i][1][:sCol-1].ljust(sCol) # Job Name
+            state = jobInfo[queue][i][2] 
+            if state == "r": state = color(color(state.center(tCol), "green"), "bold")
+            else: state = color(color(state.center(tCol), "blue"), "bold")
+            printLine += state+endLine # State
+         else: printLine += blank
+      else: printLine += blank
+   if data == 0: break
+   print(printLine)
+
+# Summary of additional jobs or blank line
+printLine = ""
+for queue in sorted(queueInfo):
+   if jobInfo.has_key(queue):
+      if len(jobInfo[queue]) > 16:
+         printLine += color((" +"+str(len(jobInfo[queue])-16)+" more jobs").center(colSum), "grey")+endLine
+      else: printLine += blank
+   else: printLine += blank
+print(printLine)
+print(dashLine)
+print(color(("<"+u"\u0470"+"|CCQC|"+u"\u0470"+">").rjust((colSum)*len(queueInfo)), "red")+"\n")
+        
+
+
