@@ -1,0 +1,6 @@
+module load molpro/2010.1/patch24
+
+setenv TMPDIR /tmp1/$USER/$JOB_ID
+setenv NSLOTS ${nslot}
+
+molpro -n $NSLOTS --nouse-logfile --no-xml-output -o ${output} ${input}

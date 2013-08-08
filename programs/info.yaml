@@ -4,15 +4,15 @@ vortex:
         debug.q:
             nodeMem: 64544
             numProc: 12
-        gen1.q:
-            nodeMem: 32272
-            numProc: 4
         gen2.q:
             nodeMem: 64544
             numProc: 12
         gen3.q:
             nodeMem: 64544
             numProc: 12
+        gen4.q:
+            nodeMem: 32768
+            numProc: 8
         large.q:
             nodeMem: 129186
             numProc: 12

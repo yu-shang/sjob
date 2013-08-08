@@ -1,0 +1,26 @@
+# Set Orca Variables
+module load orca/2.9.1
+
+setenv scratch /tmp1/$USER/$JOB_ID
+
+#Set MPI Variables
+setenv OMP_NUM_THREADS 1
+setenv NSLOTS ${nslot}
+
+# Set other variables
+set base = `basename ${input}`
+
+# Copy Job/Executable Data
+cp $SGE_O_WORKDIR/${input} $scratch/${input}
+if (-e $base.xyz) cp $base.xyz $scratch/guess.xyz
+if (-e $base.gbw) cp $base.gbw $scratch/guess.gbw
+if (-e $base.hess) cp $base.hess $scratch/guess.hess
+
+echo " Running orca on `hostname`"
+echo " Running calculation..."
+
+cd $scratch
+orca ${input} >& $SGE_O_WORKDIR/${output}
+
+echo " Saving data and cleaning up..."
+echo " Job complete on `hostname`."

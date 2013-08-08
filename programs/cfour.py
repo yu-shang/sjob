@@ -70,7 +70,17 @@ def footer(cluster):
     workdir = "PBS_O_WORKDIR"
 
   # Explicity list the files we want to save because there will be other crap in there
-  toSave = [ 'FCMINT', 'FCMFINAL', 'ZMATnew', 'JMOL.plot', 'JOBARC', 'JAINDX' 'FJOBARC', 'DIPDER', 'HESSIAN', 'MOLDEN', 'AVOGADROplot.log']
+  toSave = ['FCMINT',
+            'FCMFINAL',
+            'ZMATnew',
+            'JMOL.plot',
+            'JOBARC',
+            'JAINDX'
+            'FJOBARC',
+            'DIPDER',
+            'HESSIAN',
+            'MOLDEN',
+            'AVOGADROplot.log']
   cmd = "tar --transform \"s,^,Job_Data_${%s}/,\" -vczf ${%s}/Job_Data_${%s}.tgz %s" % (job_id, workdir, job_id, ' '.join(toSave))
 
   return cmd

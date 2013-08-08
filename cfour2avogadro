@@ -98,7 +98,11 @@ itemNum = 1 # To write label and get irIntes
 while k < len(inputLines):
     if len(inputLines[k].split()) == 3:
         symm = inputLines[k].split()
-        vib = [str('%.4f'%float(x)) for x in inputLines[k+1].split()]
+        #vib = [str('%.4f'%float(x)) for x in inputLines[k+1].split()]
+        vib = []
+        for x in inputLines[k+1].split():                                                                                       
+            if "i" in x: vib.append(str('%.4f'%float(x[:-1]))+"i")
+            else: vib.append(str('%.4f'%float(x)))
         vectors = []
         for j in range(k+3, k+3+len(coordinates)):
             temp = inputLines[j][7:].split() # To hold original data
