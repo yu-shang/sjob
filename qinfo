@@ -86,8 +86,12 @@ def get_qinfo_data(options):
    return queueInfo, jobInfo
 
 def print_qinfo_data(queueInfo, jobInfo, options): 
+   allbox = u''.join(unichr(9472 + x) for x in range(200))
+   box = [ allbox[i] for i in (2, 0, 12, 16, 20, 24, 44, 52, 28, 36, 60) ]
+   (vbar, hbar, ul, ur, ll, lr, nt, st, wt, et, plus) = box
+
    # Print title card
-   print(grey(("-"*22)+"\n# qinfo//ja//ver2.2  #\n"+("-"*22)+"\n"))
+   print(grey((hbar*22)+"\n# qinfo//ja//ver2.2  #\n"+(hbar*22)+"\n"))
  
    # Column widths and misc information
    nCol = 5 # Job Number column
@@ -96,7 +100,7 @@ def print_qinfo_data(queueInfo, jobInfo, options):
    tCol = 4 # Third column width
    colSum = fCol + sCol + tCol + nCol
    endLine = bold(red("|"))
-   dashLine = bold(red("-"*((colSum+1)*len(queueInfo))))
+   dashLine = bold(red(hbar*((colSum+1)*len(queueInfo))))
    label = bold("ID".center(nCol))+bold("  User".ljust(fCol))+bold("Job Name".ljust(sCol))+bold("St.".center(tCol))+endLine
    blank = " ".center(colSum)+endLine
    
