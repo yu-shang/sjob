@@ -80,9 +80,13 @@ def footer(cluster):
             'DIPDER',
             'HESSIAN',
             'MOLDEN',
-            'zmat*',
             'AVOGADROplot.log']
-  cmd = "tar --transform \"s,^,Job_Data_${%s}/,\" -vczf ${%s}/Job_Data_${%s}.tgz %s" % (job_id, workdir, job_id, ' '.join(toSave))
+  cmd = "tar --transform \"s,^,Job_Data_${%s}/,\" -vcf ${%s}/Job_Data_${%s}.tar %s\n" % (job_id, workdir, job_id, ' '.join(toSave))
 
-  return cmd
+  # The shell will error is zmat* does not match an existing file, so we must test for their presence.
+  toSave = ['zmat*']
+  cmd1 = "if (-e zmat001) tar --transform \"s,^,Job_Data_${%s}/,\" -vrf ${%s}/Job_Data_${%s}.tar %s\n" % (job_id, workdir, job_id, ' '.join(toSave))
+  cmd2 = "gzip ${%s}/Job_Data_${%s}.tar\n" % (workdir, job_id)
+
+  return cmd + cmd1 + cmd2
 
