@@ -75,7 +75,7 @@ def footer(cluster):
             'ZMATnew',
             'JMOL.plot',
             'JOBARC',
-            'JAINDX'
+            'JAINDX',
             'FJOBARC',
             'DIPDER',
             'HESSIAN',
