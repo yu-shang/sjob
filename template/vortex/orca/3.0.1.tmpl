@@ -1,5 +1,5 @@
 # Set Orca Variables
-module load orca/2.9.1
+module load orca/3.0.1
 
 setenv scratch /tmp1/$USER/$JOB_ID
 
@@ -20,7 +20,7 @@ echo " Running orca on `hostname`"
 echo " Running calculation..."
 
 cd $scratch
-/opt/orca/2.9.1/bin/orca ${input} >& $SGE_O_WORKDIR/${output}
+/opt/orca/3.0.1/bin/orca ${input} >& $SGE_O_WORKDIR/${output}
 
 echo " Saving data and cleaning up..."
 echo " Job complete on `hostname`."

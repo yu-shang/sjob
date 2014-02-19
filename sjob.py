@@ -7,7 +7,7 @@ import os
 import sys
 from subprocess import call
 from mako.template import Template
-from programs import cfour,molpro,psi4,qchem,nwchem,orca
+from programs import cfour,molpro,psi4,qchem,nwchem,orca,gamess
 import yaml
 import socket
 
@@ -28,6 +28,7 @@ def dummy_footer(cluster):
 checks = {
            'cfour':  { 'check_input': cfour.check_input,  'footer': cfour.footer },
            'scfour': { 'check_input': cfour.check_input,  'footer': cfour.footer },
+           'gamess': { 'check_input': gamess.check_input, 'footer': dummy_footer },
            'molpro': { 'check_input': molpro.check_input, 'footer': dummy_footer },
            'nwchem': { 'check_input': nwchem.check_input, 'footer': dummy_footer },
            'qchem':  { 'check_input': qchem.check_input,  'footer': dummy_footer },

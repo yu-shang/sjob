@@ -1,0 +1,8 @@
+module load psi/4/dcft
+
+setenv TMPDIR /tmp1/$USER/$JOB_ID
+setenv PSI_SCRATCH /tmp1/$USER/$JOB_ID
+setenv OMP_NUM_THREADS 1
+setenv NSLOTS ${nslot}
+
+psi4 -n ${nslot} -i ${input} -o ${output}

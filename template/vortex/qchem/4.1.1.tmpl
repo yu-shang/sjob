@@ -1,0 +1,8 @@
+module load qchem/4.1.1
+
+source $QC/bin/qchem.setup
+setenv TMPDIR /tmp1/$USER/$JOB_ID
+setenv QCSCRATCH $TMPDIR
+setenv NSLOTS ${nslot}
+
+qchem -np $NSLOTS ${input} ${output} 

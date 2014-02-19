@@ -80,6 +80,7 @@ def footer(cluster):
             'DIPDER',
             'HESSIAN',
             'MOLDEN',
+            'NEWMOS',
             'AVOGADROplot.log']
   cmd = "tar --transform \"s,^,Job_Data_${%s}/,\" -vcf ${%s}/Job_Data_${%s}.tar %s\n" % (job_id, workdir, job_id, ' '.join(toSave))
 

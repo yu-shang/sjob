@@ -1,0 +1,42 @@
+#!/opt/python/2.7.3/bin/python
+
+## J. Agarwal
+## Rev 1: 10/9/13
+
+import yaml
+import os
+import commands
+import time
+
+def red(phrase): return("\033[91m"+phrase+"\033[0m")
+def grey(phrase): return("\033[90m"+phrase+"\033[0m")
+def green(phrase): return("\033[92m"+phrase+"\033[0m")
+def purple(phrase): return("\033[95m"+phrase+"\033[0m")
+def blue(phrase): return("\033[94m"+phrase+"\033[0m")
+def bold(phrase): return("\033[1m"+phrase+"\033[0m")
+
+# Check for queue complete file
+homeDirectory = "/home/cluster/"+os.environ["LOGNAME"]+"/" 
+queueCompleteFile = homeDirectory+".queue_complete"
+
+if not os.path.exists(queueCompleteFile):
+   print("No completed jobs file exists ("+queueCompleteFile+")")
+
+# Load queue complete YAML
+numPrintJobs = 10
+queueComplete = yaml.load(commands.getoutput("tail -"+str(6*numPrintJobs)+" "+queueCompleteFile))
+
+# Print job information
+print(grey(("-"*28)+"\n# queuecomplete//ja//ver1  #\n"+("-"*28)+"\n"))
+
+for x in queueComplete:
+   jobDir = queueComplete[x]["Dir"].replace("/home/"+os.environ["LOGNAME"],"~")
+   jobNum = "Job #"+str(x)+": "
+   timePattern = "%a %b %m %H:%M:%S %Z %Y"
+   startTime = int(time.mktime(time.strptime(queueComplete[x]["Start"], timePattern)))
+   stopTime = int(time.mktime(time.strptime(queueComplete[x]["Stop"], timePattern))) 
+   jobTime = str(round((stopTime - startTime) / 3600.0, 1)) + " hrs" 
+   queue = queueComplete[x]["Queue"]
+
+   print(bold(jobNum).rjust(12)+jobDir)
+   print("".rjust(12)+grey(" RunTime: "+jobTime+" on "+queue))
