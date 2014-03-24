@@ -32,7 +32,7 @@ checks = {
            'molpro': { 'check_input': molpro.check_input, 'footer': dummy_footer },
            'nwchem': { 'check_input': nwchem.check_input, 'footer': dummy_footer },
            'qchem':  { 'check_input': qchem.check_input,  'footer': dummy_footer },
-           'orca' :  { 'check_input': orca.check_input,   'footer': dummy_footer },
+           'orca' :  { 'check_input': orca.check_input,   'footer': orca.footer },
            'psi':    { 'check_input': psi4.check_input,   'footer': dummy_footer } }
 
 curdir = os.getcwd().split('/')[-1]

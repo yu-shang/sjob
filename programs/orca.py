@@ -26,3 +26,16 @@ def check_input(args,nodeInfo):
 #    else:
 #      print('Memory card not found.  Max memory allowed is '+str(int(nodeMemLimit))+' MB. Default is 256 MB.')
 #
+
+def footer(cluster):
+    job_id = "JOB_ID"
+    workdir = "SGE_O_WORKDIR"
+    if cluster == "hopper":
+        job_id = "PBS_JOBID"
+        workdir = "PBS_O_WORKDIR"
+
+    cmd = """
+# delete any temporary files that my be hanging around.
+rm -f *.tmp
+tar --transform "s,^,Job_Data_${%s}/," -vzcf ${%s}/Job_Data_${%s}.tar.gz *""" % (job_id, workdir, job_id)
+    return cmd
